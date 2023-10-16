@@ -3,18 +3,14 @@ package solver;
 import java.util.*;
 
 public class SokobanState {
-    Coordinate playerPosition;
-    HashMap<Integer, Coordinate> cratePosition = new HashMap<>();
-    SokobanState parent = null;
+    private Coordinate playerPosition;
+    private HashMap<Coordinate, Integer> cratePosition = new HashMap<>();
+    private SokobanState parent = null;
+    private int score;
+    private int moves;
+    private String prevMove;
 
-    int score;
-
-    int moves;
-
-    String prevMove;
-
-
-    SokobanState(Coordinate playerPosition, HashMap<Integer, Coordinate> cratePositions, SokobanState parent,String prevMove,int moves) {
+    public SokobanState(Coordinate playerPosition, HashMap<Coordinate, Integer> cratePositions, SokobanState parent, String prevMove, int moves) {
         this.playerPosition = playerPosition;
         this.cratePosition = cratePositions;
         this.parent = parent;
@@ -22,7 +18,7 @@ public class SokobanState {
         this.moves = moves;
     }
 
-    public int getMoves(){
+    public int getMoves() {
         return this.moves;
     }
 
@@ -30,21 +26,32 @@ public class SokobanState {
         return playerPosition;
     }
 
-    public HashMap<Integer, Coordinate> getCratePosition() {
+    public HashMap<Coordinate, Integer> getCratePosition() {
         return cratePosition;
     }
 
-    public void setHeuristicScore(int score){
+    public SokobanState getParent() {
+        return parent;
+    }
+
+    public String getPrevMove() {
+        return prevMove;
+    }
+
+    public void setHeuristicScore(int score) {
         this.score = score;
     }
-    public int getScore(){
-        return  this.score;
+
+    public int getScore() {
+        return this.score;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         SokobanState that = (SokobanState) o;
         return Objects.equals(playerPosition, that.playerPosition) &&
                 Objects.equals(cratePosition, that.cratePosition);
