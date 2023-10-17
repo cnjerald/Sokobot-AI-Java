@@ -7,31 +7,49 @@ public class SokoBot {
   Set<Coordinate> goals = new HashSet<>();
   Stack<SokobanState> stack = new Stack<>();
   List<SokobanState> explored = new ArrayList<>();
+
+  ArrayList<Coordinate> deadTiles = new ArrayList<>();
+  ArrayList<Integer> goalXList = new ArrayList<>();
+  ArrayList<Integer> goalYList = new ArrayList<>();
   public String solveSokobanPuzzle(int width, int height, char[][] mapData, char[][] itemsData) {
 
     try {
 
       Coordinate initialPlayerPosition = new Coordinate(-1,-1);
-      HashMap<Integer,Coordinate> initialBoxPosition = new HashMap<>();
+      HashMap<Coordinate, Integer> initialBoxPosition = new HashMap<>();
 
       // This initializes the walls, player position, crate/box and goal coordinates.
-      int k = 0;
       for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
           if (mapData[i][j] == '#') {
             walls.add(new Coordinate(j, i));
           } else if (mapData[i][j] == '.') {
             goals.add(new Coordinate(j, i));
+            goalXList.add(j);
+            goalYList.add(i);
           }
 
           if (itemsData[i][j] == '@') {
             initialPlayerPosition = new Coordinate(j, i);
           } else if (itemsData[i][j] == '$') {
-            initialBoxPosition.put(k, new Coordinate(j, i));
-            k++;
+            initialBoxPosition.put(new Coordinate(j, i), 0);
           }
         }
       }
+
+      for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+          if ((i == 1 || i == height-2 || j == 1 || j == width-2)) {
+            if((j == 1 || j == width-2) && !goalXList.contains(j) || ((i == 1 || i == height-2)&& !goalYList.contains(i))){
+              if (mapData[i][j] == ' '){
+                mapData[i][j] = 'X';
+                deadTiles.add(new Coordinate(j,i));
+              }
+            }
+          }
+        }
+      }
+
 
       // Initial state is set and pushed into the stack
       SokobanState initialState = new SokobanState(initialPlayerPosition,initialBoxPosition,null,"",0);
@@ -91,8 +109,8 @@ public class SokoBot {
    */
   public String getMove(SokobanState state){
     StringBuilder s = new StringBuilder();
-    for(;state.parent!=null;state=state.parent){
-      s.append(state.prevMove);
+    for(;state.getParent()!=null;state=state.getParent()){
+      s.append(state.getPrevMove());
     }
     System.out.println(s.reverse().toString());
     return s.toString();
@@ -109,23 +127,23 @@ public class SokoBot {
   public List<SokobanState> generateSubstates(SokobanState frontier){
     List <SokobanState> generatedStates = new ArrayList<>();
     generatedStates.clear();
+    HashMap<Coordinate, Integer> newCratePosition;
+    SokobanState temporaryState;
 
     // If the move is valid for movement "UP".
     if (isValid(frontier, 'u')) {
-      HashMap<Integer, Coordinate> newCratePosition = new HashMap<>(frontier.getCratePosition());
+      newCratePosition = new HashMap<>(frontier.getCratePosition());
       // Hard copy the state to avoid issues related to memory address.
-      SokobanState temporaryState = new SokobanState(
+      temporaryState = new SokobanState(
               new Coordinate(frontier.getPlayerPosition().getX(), frontier.getPlayerPosition().getY() - 1),
               newCratePosition, // Use the new cratePosition map
               frontier,"u",frontier.getMoves()+1
       );
 
       // If there is a box infront of the user, move it forward (The error handling of this is already handled in isValid() method.
-      for (int i = 0; i < goals.size(); i++) {
-        if (temporaryState.getPlayerPosition().equals(temporaryState.getCratePosition().get(i))) {
-          temporaryState.getCratePosition().put(i, new Coordinate(frontier.getPlayerPosition().getX(), frontier.getPlayerPosition().getY() - 2));
-          break;
-        }
+      if (temporaryState.getCratePosition().get(temporaryState.getPlayerPosition()) != null) {
+          temporaryState.getCratePosition().remove(temporaryState.getPlayerPosition());
+          temporaryState.getCratePosition().put(new Coordinate(frontier.getPlayerPosition().getX(), frontier.getPlayerPosition().getY() - 2), 0);
       }
 
       // If this state already exist, then there is no need to add it to the generated state.
@@ -135,19 +153,17 @@ public class SokoBot {
     }
 
     if (isValid(frontier, 'd')) {
-      HashMap<Integer, Coordinate> newCratePosition = new HashMap<>(frontier.getCratePosition());
+      newCratePosition = new HashMap<>(frontier.getCratePosition());
 
-      SokobanState temporaryState = new SokobanState(
+      temporaryState = new SokobanState(
               new Coordinate(frontier.getPlayerPosition().getX(), frontier.getPlayerPosition().getY() + 1),
               newCratePosition, // Use the new cratePosition map
               frontier,"d",frontier.getMoves()+1
       );
 
-      for (int i = 0; i < goals.size(); i++) {
-        if (temporaryState.getPlayerPosition().equals(temporaryState.getCratePosition().get(i))) {
-          temporaryState.getCratePosition().put(i, new Coordinate(frontier.getPlayerPosition().getX(), frontier.getPlayerPosition().getY() + 2));
-          break;
-        }
+      if (temporaryState.getCratePosition().get(temporaryState.getPlayerPosition()) != null) {
+          temporaryState.getCratePosition().remove(temporaryState.getPlayerPosition());
+          temporaryState.getCratePosition().put(new Coordinate(frontier.getPlayerPosition().getX(), frontier.getPlayerPosition().getY() + 2), 0);
       }
 
       if (!explored.contains(temporaryState)) {
@@ -156,19 +172,17 @@ public class SokoBot {
     }
 
     if (isValid(frontier, 'l')) {
-      HashMap<Integer, Coordinate> newCratePosition = new HashMap<>(frontier.getCratePosition());
+      newCratePosition = new HashMap<>(frontier.getCratePosition());
 
-      SokobanState temporaryState = new SokobanState(
+      temporaryState = new SokobanState(
               new Coordinate(frontier.getPlayerPosition().getX() - 1, frontier.getPlayerPosition().getY()),
               newCratePosition, // Use the new cratePosition map
               frontier,"l",frontier.getMoves()+1
       );
 
-      for (int i = 0; i < goals.size(); i++) {
-        if (temporaryState.getPlayerPosition().equals(temporaryState.getCratePosition().get(i))) {
-          temporaryState.getCratePosition().put(i, new Coordinate(frontier.getPlayerPosition().getX() - 2, frontier.getPlayerPosition().getY()));
-          break;
-        }
+      if (temporaryState.getCratePosition().get(temporaryState.getPlayerPosition()) != null) {
+          temporaryState.getCratePosition().remove(temporaryState.getPlayerPosition());
+          temporaryState.getCratePosition().put(new Coordinate(frontier.getPlayerPosition().getX() - 2, frontier.getPlayerPosition().getY()), 0);
       }
 
       if (!explored.contains(temporaryState)) {
@@ -177,19 +191,17 @@ public class SokoBot {
     }
 
     if (isValid(frontier, 'r')) {
-      HashMap<Integer, Coordinate> newCratePosition = new HashMap<>(frontier.getCratePosition());
+      newCratePosition = new HashMap<>(frontier.getCratePosition());
 
-      SokobanState temporaryState = new SokobanState(
+      temporaryState = new SokobanState(
               new Coordinate(frontier.getPlayerPosition().getX() + 1, frontier.getPlayerPosition().getY()),
               newCratePosition, // Use the new cratePosition map
               frontier,"r",frontier.getMoves()+1
       );
 
-      for (int i = 0; i < goals.size(); i++) {
-        if (temporaryState.getPlayerPosition().equals(temporaryState.getCratePosition().get(i))) {
-          temporaryState.getCratePosition().put(i, new Coordinate(frontier.getPlayerPosition().getX() + 2, frontier.getPlayerPosition().getY()));
-          break;
-        }
+      if (temporaryState.getCratePosition().get(temporaryState.getPlayerPosition()) != null) {
+          temporaryState.getCratePosition().remove(temporaryState.getPlayerPosition());
+          temporaryState.getCratePosition().put(new Coordinate(frontier.getPlayerPosition().getX() + 2, frontier.getPlayerPosition().getY()), 0);
       }
 
       if (!explored.contains(temporaryState)) {
@@ -209,11 +221,9 @@ public class SokoBot {
 
   public boolean isGoal(SokobanState state){
     int counter = 0;
-    for(Coordinate c : goals){
-      for(int i = 0; i < goals.size(); i++){
-        if(c.getX() == state.getCratePosition().get(i).getX() && c.getY() == state.getCratePosition().get(i).getY()){
+    for(Coordinate g : goals){
+      if(state.getCratePosition().get(g) != null){
           counter++;
-        }
       }
     }
     if(counter == goals.size()){
@@ -244,14 +254,20 @@ public class SokoBot {
       case 'd':{
 
         // If there is a wall infront of the player checker.
-        if(walls.contains(new Coordinate(state.playerPosition.getX(),state.getPlayerPosition().getY()+1))){
+        if(walls.contains(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+1))){
           return false;
+        }
+
+        if(state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+1))) { // if there is box
+          if(deadTiles.contains(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+2))){
+            return false;
+          }
         }
 
         // If the box is adjacent and PARALLEL to the wall, and the box is pushed adjacent to another box on the direction
         // where it is pushed.
-        if(state.getCratePosition().containsValue(new Coordinate(state.playerPosition.getX(),state.getPlayerPosition().getY()+1))) {
-          if(state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+3))
+        if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+1)) != null) {
+          if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+3)) != null
                   && ((walls.contains(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()+2))
                   && walls.contains(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()+3))) ||
                   (walls.contains(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY()+2))
@@ -270,9 +286,9 @@ public class SokoBot {
         // If the box is adjacent and PERPENDICULAR to the wall, and the box is pushed adjacent to another box on the direction
         // where it is pushed.
 
-        if(state.getCratePosition().containsValue(new Coordinate(state.playerPosition.getX(),state.getPlayerPosition().getY()+1))) { // if there is box
-          if ((state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX() + 1, state.getPlayerPosition().getY() + 2)) || // box adjacency left
-                  state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX() - 1, state.getPlayerPosition().getY() + 2))) // box adjacency right
+        if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+1)) != null) { // if there is box
+          if ((state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX() + 1, state.getPlayerPosition().getY() + 2)) != null || // box adjacency left
+                  state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX() - 1, state.getPlayerPosition().getY() + 2)) != null) // box adjacency right
                   && walls.contains(new Coordinate(state.getPlayerPosition().getX(), state.getPlayerPosition().getY() + 3)) && //wall below first box
                   (walls.contains(new Coordinate(state.getPlayerPosition().getX() - 1, state.getPlayerPosition().getY() + 3)) || // wall below second box
                           walls.contains(new Coordinate(state.getPlayerPosition().getX() + 1, state.getPlayerPosition().getY() + 3))) && // wall below second box alt.
@@ -285,8 +301,8 @@ public class SokoBot {
         }
 
         // Two things are being checked here which is listed in the comments below.
-        for(int i = 0 ; i < goals.size(); i++){
-          if(state.getCratePosition().get(i).equals(new Coordinate(state.playerPosition.getX(),state.getPlayerPosition().getY()+1))){
+        for(Coordinate cratePosition : state.getCratePosition().keySet()){
+          if(cratePosition.equals(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+1))){
 
             // The box is pushed into a corner, where this corner is not a goal state.
             if((walls.contains(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()+1)) // wall on left
@@ -297,9 +313,9 @@ public class SokoBot {
             }
 
             // The box is pushed, where there is a box in the direction where it is pushed.
-            for(int j = 0 ; j < goals.size();j++){
+            for(Coordinate cratePosition2 : state.getCratePosition().keySet()){
 
-              if(state.getCratePosition().get(j).equals(new Coordinate(state.playerPosition.getX(),state.getPlayerPosition().getY()+2))){
+              if(cratePosition2.equals(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+2))){
                 return false;
               }
             }
@@ -310,11 +326,18 @@ public class SokoBot {
         break;
       }
       case 'u':{
-        if(walls.contains(new Coordinate(state.playerPosition.getX(),state.getPlayerPosition().getY()-1))){
+        if(walls.contains(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-1))){
           return false;
         }
-        if(state.getCratePosition().containsValue(new Coordinate(state.playerPosition.getX(),state.getPlayerPosition().getY()-1))) { // if there is box
-          if(state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-3))
+
+        if(state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+1))) { // if there is box
+          if(deadTiles.contains(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-2))){
+            return false;
+          }
+        }
+
+        if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-1)) != null) { // if there is box
+          if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-3)) != null
                   && ((walls.contains(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()-2))
                   && walls.contains(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()-3))) ||
                   (walls.contains(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY()-2))
@@ -328,9 +351,9 @@ public class SokoBot {
         }
 
 
-        if(state.getCratePosition().containsValue(new Coordinate(state.playerPosition.getX(),state.getPlayerPosition().getY()-1))) { // if there is box
-          if ((state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX() + 1, state.getPlayerPosition().getY() - 2)) || // box adjacency left
-                  state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX() - 1, state.getPlayerPosition().getY() - 2))) // box adjacency right
+        if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-1)) != null) { // if there is box
+          if ((state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX() + 1, state.getPlayerPosition().getY() - 2)) != null || // box adjacency left
+                  state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX() - 1, state.getPlayerPosition().getY() - 2)) != null) // box adjacency right
                   && walls.contains(new Coordinate(state.getPlayerPosition().getX(), state.getPlayerPosition().getY() - 3)) && //wall below first box
                   (walls.contains(new Coordinate(state.getPlayerPosition().getX() - 1, state.getPlayerPosition().getY() - 3)) || // wall below second box
                           walls.contains(new Coordinate(state.getPlayerPosition().getX() + 1, state.getPlayerPosition().getY() - 3))) && // wall below second box alt.
@@ -342,8 +365,8 @@ public class SokoBot {
           }
         }
 
-        for(int i = 0 ; i < goals.size(); i++){
-          if(state.getCratePosition().get(i).equals(new Coordinate(state.playerPosition.getX(),state.getPlayerPosition().getY()-1))){
+        for(Coordinate cratePosition : state.getCratePosition().keySet()){
+          if(cratePosition.equals(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-1))){
 
             if((walls.contains(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()-1)) // wall on left
                     || walls.contains(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY()-1))) // wall on right
@@ -352,8 +375,8 @@ public class SokoBot {
               return false;
             }
 
-            for(int j = 0 ; j < goals.size();j++){
-              if(state.getCratePosition().get(j).equals(new Coordinate(state.playerPosition.getX(),state.getPlayerPosition().getY()-2))){
+            for(Coordinate cratePosition2 : state.getCratePosition().keySet()){
+              if(cratePosition2.equals(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-2))){
                 return false;// if this is printed, then I can't go down. since double box
               }
             }
@@ -363,11 +386,18 @@ public class SokoBot {
         break;
       }
       case 'l':{
-        if(walls.contains(new Coordinate(state.playerPosition.getX()-1,state.getPlayerPosition().getY()))){
+        if(walls.contains(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()))){
           return false;
         }
-        if(state.getCratePosition().containsValue(new Coordinate(state.playerPosition.getX()-1,state.getPlayerPosition().getY()))) {
-          if(state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX()-3,state.getPlayerPosition().getY()))
+
+        if(state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()))) { // if there is box
+          if(deadTiles.contains(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY()))){
+            return false;
+          }
+        }
+
+        if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY())) != null) {
+          if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX()-3,state.getPlayerPosition().getY())) != null
                   && ((walls.contains(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY()-1))
                   && walls.contains(new Coordinate(state.getPlayerPosition().getX()-3,state.getPlayerPosition().getY()-1))) ||
                   (walls.contains(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY()+1))
@@ -382,9 +412,11 @@ public class SokoBot {
 
 
 
-        if(state.getCratePosition().containsValue(new Coordinate(state.playerPosition.getX()-1,state.getPlayerPosition().getY()))) { // if there is box
-          if ((state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX() - 2, state.getPlayerPosition().getY() + 1)) || // box adjacency left
-                  state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX() -2, state.getPlayerPosition().getY() - 1))) // box adjacency right
+
+
+        if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY())) != null) { // if there is box
+          if ((state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX() - 2, state.getPlayerPosition().getY() + 1)) != null || // box adjacency left
+                  state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX() -2, state.getPlayerPosition().getY() - 1)) != null) // box adjacency right
                   && walls.contains(new Coordinate(state.getPlayerPosition().getX()-3, state.getPlayerPosition().getY())) && //wall below first box
                   (walls.contains(new Coordinate(state.getPlayerPosition().getX() - 3, state.getPlayerPosition().getY() + 1)) || // wall below second box
                           walls.contains(new Coordinate(state.getPlayerPosition().getX() - 3, state.getPlayerPosition().getY() - 1))) && // wall below second box alt.
@@ -398,9 +430,9 @@ public class SokoBot {
         }
 
 
-        for(int i = 0 ; i < goals.size(); i++){
-          if(state.getCratePosition().get(i).equals(new Coordinate(state.playerPosition.getX()-1,state.getPlayerPosition().getY()))){
-            for(int j = 0 ; j < goals.size();j++){
+        for(Coordinate cratePosition : state.getCratePosition().keySet()){
+          if(cratePosition.equals(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()))){
+            for(Coordinate cratePosition2 : state.getCratePosition().keySet()){
 
               if((walls.contains(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()+1)) // wall below
                       || walls.contains(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()-1))) // wall above
@@ -409,7 +441,7 @@ public class SokoBot {
                 return false;
               }
 
-              if(state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX()-3,state.getPlayerPosition().getY()))
+              if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX()-3,state.getPlayerPosition().getY())) != null
                       && ((walls.contains(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY()-1))
                       && walls.contains(new Coordinate(state.getPlayerPosition().getX()-3,state.getPlayerPosition().getY()-1))) ||
                       (walls.contains(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY()+1))
@@ -420,7 +452,7 @@ public class SokoBot {
                 return false;
               }
 
-              if(state.getCratePosition().get(j).equals(new Coordinate(state.playerPosition.getX()-2,state.getPlayerPosition().getY()))){
+              if(cratePosition2.equals(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY()))){
                 return false;// if this is printed, then I can't go down. since double box
               }
             }
@@ -432,12 +464,19 @@ public class SokoBot {
         break;
       }
       case 'r':{
-        if(walls.contains(new Coordinate(state.playerPosition.getX()+1,state.getPlayerPosition().getY()))){
+        if(walls.contains(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY()))){
           return false;
         }
 
-        if(state.getCratePosition().containsValue(new Coordinate(state.playerPosition.getX()+1,state.getPlayerPosition().getY()))) {
-          if(state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX()+3,state.getPlayerPosition().getY()))
+        if(state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY()))) { // if there is box
+          if(deadTiles.contains(new Coordinate(state.getPlayerPosition().getX()+2,state.getPlayerPosition().getY()))){
+            return false;
+          }
+        }
+
+
+        if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY())) != null) {
+          if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX()+3,state.getPlayerPosition().getY())) != null
                   && ((walls.contains(new Coordinate(state.getPlayerPosition().getX()+2,state.getPlayerPosition().getY()-1))
                   && walls.contains(new Coordinate(state.getPlayerPosition().getX()+3,state.getPlayerPosition().getY()-1))) ||
                   (walls.contains(new Coordinate(state.getPlayerPosition().getX()+2,state.getPlayerPosition().getY()+1))
@@ -450,9 +489,11 @@ public class SokoBot {
           }
         }
 
-        if(state.getCratePosition().containsValue(new Coordinate(state.playerPosition.getX()+1,state.getPlayerPosition().getY()))) { // if there is box
-          if ((state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX() + 2, state.getPlayerPosition().getY() + 1)) || // box adjacency left
-                  state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX() + 2, state.getPlayerPosition().getY() - 1))) // box adjacency right
+
+
+        if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY())) != null) { // if there is box
+          if ((state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX() + 2, state.getPlayerPosition().getY() + 1)) != null || // box adjacency left
+                  state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX() + 2, state.getPlayerPosition().getY() - 1)) != null) // box adjacency right
                   && walls.contains(new Coordinate(state.getPlayerPosition().getX()+3, state.getPlayerPosition().getY())) && //wall below first box
                   (walls.contains(new Coordinate(state.getPlayerPosition().getX() + 3, state.getPlayerPosition().getY() + 1)) || // wall below second box
                           walls.contains(new Coordinate(state.getPlayerPosition().getX() + 3, state.getPlayerPosition().getY() - 1))) && // wall below second box alt.
@@ -464,9 +505,9 @@ public class SokoBot {
           }
         }
 
-        for(int i = 0 ; i < goals.size(); i++){
-          if(state.getCratePosition().get(i).equals(new Coordinate(state.playerPosition.getX()+1,state.getPlayerPosition().getY()))){
-            for(int j = 0 ; j < goals.size();j++){
+        for(Coordinate cratePosition : state.getCratePosition().keySet()){
+          if(cratePosition.equals(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY()))){
+            for(Coordinate cratePosition2 : state.getCratePosition().keySet()){
 
               if((walls.contains(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY()+1)) // wall below
                       || walls.contains(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY()-1))) // wall above
@@ -475,7 +516,7 @@ public class SokoBot {
                 return false;
               }
 
-              if(state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX()+3,state.getPlayerPosition().getY()))
+              if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX()+3,state.getPlayerPosition().getY())) != null
                       && ((walls.contains(new Coordinate(state.getPlayerPosition().getX()+2,state.getPlayerPosition().getY()-1))
                       && walls.contains(new Coordinate(state.getPlayerPosition().getX()+3,state.getPlayerPosition().getY()-1))) ||
                       (walls.contains(new Coordinate(state.getPlayerPosition().getX()+2,state.getPlayerPosition().getY()+1))
@@ -486,7 +527,7 @@ public class SokoBot {
                 return false;
               }
 
-              if(state.getCratePosition().get(j).equals(new Coordinate(state.playerPosition.getX()+2,state.getPlayerPosition().getY()))){
+              if(cratePosition2.equals(new Coordinate(state.getPlayerPosition().getX()+2,state.getPlayerPosition().getY()))){
                 return false;// if this is printed, then I can't go down. since double box
               }
             }
@@ -510,8 +551,7 @@ public class SokoBot {
     int minimum = Integer.MAX_VALUE; // Initialize with a high value to find the minimum distance.
 
     for (Coordinate goalCoordinate : goals) {
-      for (int i = 0; i < state.getCratePosition().size(); i++) {
-        Coordinate cratePosition = state.getCratePosition().get(i);
+      for (Coordinate cratePosition : state.getCratePosition().keySet()) {
         int manhattanDistance = Math.abs(cratePosition.getX() - goalCoordinate.getX())
                 + Math.abs(cratePosition.getY() - goalCoordinate.getY());
         minimum = Math.min(minimum, manhattanDistance);
@@ -531,11 +571,9 @@ public class SokoBot {
   public int calculateManHDistPlayerToBoxes(SokobanState state){
     int minimum = Integer.MAX_VALUE; // Initialize with a high value to find the minimum distance.
 
-    for (int i = 0; i < state.getCratePosition().size(); i++) {
-      Coordinate cratePosition = state.getCratePosition().get(i);
+    for (Coordinate cratePosition : state.getCratePosition().keySet()) {
       int manhattanDistance = Math.abs(cratePosition.getX() - state.getPlayerPosition().getX())
               + Math.abs(cratePosition.getY() - state.getPlayerPosition().getY());
-
       minimum = Math.min(minimum, manhattanDistance);
     }
 
