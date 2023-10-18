@@ -8,7 +8,7 @@ public class SokoBot {
   Stack<SokobanState> stack = new Stack<>();
   List<SokobanState> explored = new ArrayList<>();
 
-  ArrayList<Coordinate> deadTiles = new ArrayList<>();
+  List<Coordinate> deadTiles = new ArrayList<>();
   ArrayList<Integer> goalXList = new ArrayList<>();
   ArrayList<Integer> goalYList = new ArrayList<>();
   public String solveSokobanPuzzle(int width, int height, char[][] mapData, char[][] itemsData) {
@@ -39,17 +39,34 @@ public class SokoBot {
 
       for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-          if ((i == 1 || i == height-2 || j == 1 || j == width-2)) {
             if((j == 1 || j == width-2) && !goalXList.contains(j) || ((i == 1 || i == height-2)&& !goalYList.contains(i))){
               if (mapData[i][j] == ' '){
                 mapData[i][j] = 'X';
                 deadTiles.add(new Coordinate(j,i));
               }
             }
-          }
+            if(i > 0 && j > 0 && i < height-1 && j < width-1){
+              if(mapData[i][j] == ' '){
+                if((mapData[i-1][j] == '#' && (mapData[i][j-1] == '#' || mapData[i][j+1] == '#'))){ // left
+                  mapData[i][j] = 'X';
+                  deadTiles.add(new Coordinate(j,i));
+                }
+                if((mapData[i+1][j] == '#' && (mapData[i][j-1] == '#' || mapData[i][j+1] == '#'))){ // left
+                  mapData[i][j] = 'X';
+                  deadTiles.add(new Coordinate(j,i));
+                }
+              }
+            }
         }
       }
 
+      /* View DeadTiles
+      for(int i = 0; i < height ; i++){
+        for(int j = 0; j < width; j++){
+          System.out.print(mapData[i][j]);
+        }
+        System.out.println();
+      }*/
 
       // Initial state is set and pushed into the stack
       SokobanState initialState = new SokobanState(initialPlayerPosition,initialBoxPosition,null,"",0);
@@ -60,10 +77,10 @@ public class SokoBot {
 
         SokobanState frontier = popLowestScore(stack);
 
-
+/* Debugger.
         System.out.println(frontier.getPlayerPosition().getX() + " " + frontier.getPlayerPosition().getY());
         System.out.println(frontier.getScore());
-
+*/
 
         // If the boxes are in goal, terminate and return string
         if(isGoal(frontier)){
@@ -98,6 +115,7 @@ public class SokoBot {
     } catch (Exception ex) {
       ex.printStackTrace();
     }
+    System.out.println("All Possibilities calculated");
     return null;
   }
 
@@ -258,8 +276,11 @@ public class SokoBot {
           return false;
         }
 
-        if(state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+1))) { // if there is box
+        if(state.getCratePosition().containsKey(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+1))) { // if there is box
           if(deadTiles.contains(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+2))){
+            return false;
+          }
+          if(state.getCratePosition().containsKey(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+2))){
             return false;
           }
         }
@@ -275,7 +296,6 @@ public class SokoBot {
                   && (!goals.contains(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+2)) ||
                   !goals.contains(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+3)))
           ){
-            System.out.println("Tester!XXXXXXXXXXXXXXXXXXXXXXXXXXXX");
             return false;
           }
 
@@ -300,28 +320,7 @@ public class SokoBot {
           }
         }
 
-        // Two things are being checked here which is listed in the comments below.
-        for(Coordinate cratePosition : state.getCratePosition().keySet()){
-          if(cratePosition.equals(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+1))){
 
-            // The box is pushed into a corner, where this corner is not a goal state.
-            if((walls.contains(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()+1)) // wall on left
-                    || walls.contains(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY()+1))) // wall on right
-                    && walls.contains(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+2)) // wall below.
-                    && !goals.contains(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+1))){ // no goal.
-              return false;
-            }
-
-            // The box is pushed, where there is a box in the direction where it is pushed.
-            for(Coordinate cratePosition2 : state.getCratePosition().keySet()){
-
-              if(cratePosition2.equals(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+2))){
-                return false;
-              }
-            }
-
-          }
-        }
 
         break;
       }
@@ -330,8 +329,11 @@ public class SokoBot {
           return false;
         }
 
-        if(state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+1))) { // if there is box
+        if(state.getCratePosition().containsKey(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-1))) { // if there is box
           if(deadTiles.contains(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-2))){
+            return false;
+          }
+          if(state.getCratePosition().containsKey(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-2))){
             return false;
           }
         }
@@ -345,7 +347,6 @@ public class SokoBot {
                   && (!goals.contains(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-2)) ||
                   !goals.contains(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-3)))
           ){
-            System.out.println("Tester!XXXXXXXXXXXXXXXXXXXXXXXXXXXX");
             return false;
           }
         }
@@ -365,23 +366,7 @@ public class SokoBot {
           }
         }
 
-        for(Coordinate cratePosition : state.getCratePosition().keySet()){
-          if(cratePosition.equals(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-1))){
 
-            if((walls.contains(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()-1)) // wall on left
-                    || walls.contains(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY()-1))) // wall on right
-                    && walls.contains(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-2)) // wall above
-                    && !goals.contains(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-1))){
-              return false;
-            }
-
-            for(Coordinate cratePosition2 : state.getCratePosition().keySet()){
-              if(cratePosition2.equals(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-2))){
-                return false;// if this is printed, then I can't go down. since double box
-              }
-            }
-          }
-        }
 
         break;
       }
@@ -390,8 +375,11 @@ public class SokoBot {
           return false;
         }
 
-        if(state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()))) { // if there is box
+        if(state.getCratePosition().containsKey(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()))) { // if there is box
           if(deadTiles.contains(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY()))){
+            return false;
+          }
+          if(state.getCratePosition().containsKey(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY()))){
             return false;
           }
         }
@@ -405,14 +393,9 @@ public class SokoBot {
                   && (!goals.contains(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY())) ||
                   !goals.contains(new Coordinate(state.getPlayerPosition().getX()-3,state.getPlayerPosition().getY())))
           ){
-            System.out.println("Tester!XXXXXXXXXXXXXXXXXXXXXXXXXXXX");
             return false;
           }
         }
-
-
-
-
 
         if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY())) != null) { // if there is box
           if ((state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX() - 2, state.getPlayerPosition().getY() + 1)) != null || // box adjacency left
@@ -429,38 +412,6 @@ public class SokoBot {
           }
         }
 
-
-        for(Coordinate cratePosition : state.getCratePosition().keySet()){
-          if(cratePosition.equals(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()))){
-            for(Coordinate cratePosition2 : state.getCratePosition().keySet()){
-
-              if((walls.contains(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()+1)) // wall below
-                      || walls.contains(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()-1))) // wall above
-                      && walls.contains(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY())) // wall on left.
-                      && !goals.contains(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()))){ // goal on next spot.
-                return false;
-              }
-
-              if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX()-3,state.getPlayerPosition().getY())) != null
-                      && ((walls.contains(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY()-1))
-                      && walls.contains(new Coordinate(state.getPlayerPosition().getX()-3,state.getPlayerPosition().getY()-1))) ||
-                      (walls.contains(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY()+1))
-                              && walls.contains(new Coordinate(state.getPlayerPosition().getX()-3,state.getPlayerPosition().getY()+1))))
-                      && (!goals.contains(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY())) ||
-                      !goals.contains(new Coordinate(state.getPlayerPosition().getX()-3,state.getPlayerPosition().getY())))
-              ){
-                return false;
-              }
-
-              if(cratePosition2.equals(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY()))){
-                return false;// if this is printed, then I can't go down. since double box
-              }
-            }
-          }
-        }
-
-
-
         break;
       }
       case 'r':{
@@ -468,8 +419,11 @@ public class SokoBot {
           return false;
         }
 
-        if(state.getCratePosition().containsValue(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY()))) { // if there is box
+        if(state.getCratePosition().containsKey(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY()))) { // if there is box
           if(deadTiles.contains(new Coordinate(state.getPlayerPosition().getX()+2,state.getPlayerPosition().getY()))){
+            return false;
+          }
+          if(state.getCratePosition().containsKey(new Coordinate(state.getPlayerPosition().getX()+2,state.getPlayerPosition().getY()))){
             return false;
           }
         }
@@ -484,7 +438,6 @@ public class SokoBot {
                   && (!goals.contains(new Coordinate(state.getPlayerPosition().getX()+2,state.getPlayerPosition().getY())) ||
                   !goals.contains(new Coordinate(state.getPlayerPosition().getX()+3,state.getPlayerPosition().getY())))
           ){
-            System.out.println("Tester!XXXXXXXXXXXXXXXXXXXXXXXXXXXX");
             return false;
           }
         }
@@ -502,35 +455,6 @@ public class SokoBot {
                                   !goals.contains(new Coordinate(state.getPlayerPosition().getX() + 2, state.getPlayerPosition().getY() - 1))) // adjacent box not a goal alt
                   )) {
             return false;
-          }
-        }
-
-        for(Coordinate cratePosition : state.getCratePosition().keySet()){
-          if(cratePosition.equals(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY()))){
-            for(Coordinate cratePosition2 : state.getCratePosition().keySet()){
-
-              if((walls.contains(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY()+1)) // wall below
-                      || walls.contains(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY()-1))) // wall above
-                      && walls.contains(new Coordinate(state.getPlayerPosition().getX()+2,state.getPlayerPosition().getY())) // wall on left.
-                      && !goals.contains(new Coordinate(state.getPlayerPosition().getX()+1,state.getPlayerPosition().getY()))){ // goal on next spot.
-                return false;
-              }
-
-              if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX()+3,state.getPlayerPosition().getY())) != null
-                      && ((walls.contains(new Coordinate(state.getPlayerPosition().getX()+2,state.getPlayerPosition().getY()-1))
-                      && walls.contains(new Coordinate(state.getPlayerPosition().getX()+3,state.getPlayerPosition().getY()-1))) ||
-                      (walls.contains(new Coordinate(state.getPlayerPosition().getX()+2,state.getPlayerPosition().getY()+1))
-                              && walls.contains(new Coordinate(state.getPlayerPosition().getX()+3,state.getPlayerPosition().getY()+1))))
-                      && (!goals.contains(new Coordinate(state.getPlayerPosition().getX()+2,state.getPlayerPosition().getY())) ||
-                      !goals.contains(new Coordinate(state.getPlayerPosition().getX()+3,state.getPlayerPosition().getY())))
-              ){
-                return false;
-              }
-
-              if(cratePosition2.equals(new Coordinate(state.getPlayerPosition().getX()+2,state.getPlayerPosition().getY()))){
-                return false;// if this is printed, then I can't go down. since double box
-              }
-            }
           }
         }
 
@@ -598,7 +522,6 @@ public class SokoBot {
         lowestScoreState = state;
       }
     }
-
     // Remove the lowest score state from the stack
     Stack<SokobanState> tempStack = new Stack<>();
     while (!stack.isEmpty()) {
