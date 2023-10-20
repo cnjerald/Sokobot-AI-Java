@@ -5,7 +5,7 @@ import java.util.*;
 public class SokoBot {
   Set<Coordinate> walls = new HashSet<>();
   Set<Coordinate> goals = new HashSet<>();
-  Stack<SokobanState> stack = new Stack<>();
+  PriorityQueue<SokobanState> pqueue = new PriorityQueue<>();
   List<SokobanState> explored = new ArrayList<>();
 
   List<Coordinate> deadTiles = new ArrayList<>();
@@ -70,12 +70,12 @@ public class SokoBot {
 
       // Initial state is set and pushed into the stack
       SokobanState initialState = new SokobanState(initialPlayerPosition,initialBoxPosition,null,"",0);
-      stack.push(initialState);
+      pqueue.add(initialState);
 
 
-      while(!stack.isEmpty()){
+      while(!pqueue.isEmpty()){
 
-        SokobanState frontier = popLowestScore(stack);
+        SokobanState frontier = pqueue.poll();
 
 /* Debugger.
         System.out.println(frontier.getPlayerPosition().getX() + " " + frontier.getPlayerPosition().getY());
@@ -84,7 +84,7 @@ public class SokoBot {
 
         // If the boxes are in goal, terminate and return string
         if(isGoal(frontier)){
-          stack.clear();
+          pqueue.clear();
           try{
             return getMove(frontier);
           } catch (NullPointerException e){
@@ -106,7 +106,7 @@ public class SokoBot {
             }else{
               state.setHeuristicScore(calculateManHDistBoxesToGoals(state) + calculateManHDistPlayerToBoxes(state));
             }
-            stack.push(state);
+            pqueue.add(state);
           }
 
         }
@@ -276,11 +276,11 @@ public class SokoBot {
           return false;
         }
 
-        if(state.getCratePosition().containsKey(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+1))) { // if there is box
+        if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+1)) != null) { // if there is box
           if(deadTiles.contains(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+2))){
             return false;
           }
-          if(state.getCratePosition().containsKey(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+2))){
+          if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()+2)) != null){
             return false;
           }
         }
@@ -329,11 +329,11 @@ public class SokoBot {
           return false;
         }
 
-        if(state.getCratePosition().containsKey(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-1))) { // if there is box
+        if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-1)) != null) { // if there is box
           if(deadTiles.contains(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-2))){
             return false;
           }
-          if(state.getCratePosition().containsKey(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-2))){
+          if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX(),state.getPlayerPosition().getY()-2)) != null){
             return false;
           }
         }
@@ -375,11 +375,11 @@ public class SokoBot {
           return false;
         }
 
-        if(state.getCratePosition().containsKey(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY()))) { // if there is box
+        if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX()-1,state.getPlayerPosition().getY())) != null) { // if there is box
           if(deadTiles.contains(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY()))){
             return false;
           }
-          if(state.getCratePosition().containsKey(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY()))){
+          if(state.getCratePosition().get(new Coordinate(state.getPlayerPosition().getX()-2,state.getPlayerPosition().getY())) != null){
             return false;
           }
         }
@@ -503,40 +503,4 @@ public class SokoBot {
 
     return minimum;
   }
-
-  /**
-   * This is a helper function that pops the lowest score in the stack.
-   *
-   * @param stack - Current stack
-   * @return - SokobanState with the lowest score.
-   */
-  public static SokobanState popLowestScore(Stack<SokobanState> stack) {
-    if (stack.isEmpty()) {
-      // Handle the case when the stack is empty
-      return null;
-    }
-
-    SokobanState lowestScoreState = stack.peek(); // Initialize with the top element
-    for (SokobanState state : stack) {
-      if (state.getScore() < lowestScoreState.getScore()) {
-        lowestScoreState = state;
-      }
-    }
-    // Remove the lowest score state from the stack
-    Stack<SokobanState> tempStack = new Stack<>();
-    while (!stack.isEmpty()) {
-      SokobanState currentState = stack.pop();
-      if (currentState != lowestScoreState) {
-        tempStack.push(currentState);
-      }
-    }
-
-    // Rebuild the original stack without the lowest score state
-    while (!tempStack.isEmpty()) {
-      stack.push(tempStack.pop());
-    }
-
-    return lowestScoreState;
-  }
-
 }

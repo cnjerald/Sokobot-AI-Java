@@ -2,7 +2,7 @@ package solver;
 
 import java.util.*;
 
-public class SokobanState {
+public class SokobanState implements Comparable<SokobanState> {
     private Coordinate playerPosition;
     private HashMap<Coordinate, Integer> cratePosition = new HashMap<>();
     private SokobanState parent = null;
@@ -60,5 +60,17 @@ public class SokobanState {
     @Override
     public int hashCode() {
         return Objects.hash(playerPosition, cratePosition);
+    }
+
+    @Override
+    public int compareTo(SokobanState state) {
+        int ret;
+        if (score > state.getScore()) {
+            ret = 1;
+        }
+        else {
+            ret = -1;
+        }
+        return ret;
     }
 }
