@@ -2,7 +2,7 @@ package solver;
 
 import java.util.*;
 
-public class SokobanState {
+public class SokobanState implements Comparable<SokobanState> {
     private Coordinate playerPosition;
     private HashMap<Coordinate, Integer> cratePosition = new HashMap<>();
     private SokobanState parent = null;
@@ -55,6 +55,12 @@ public class SokobanState {
         SokobanState that = (SokobanState) o;
         return Objects.equals(playerPosition, that.playerPosition) &&
                 Objects.equals(cratePosition, that.cratePosition);
+    }
+
+
+    @Override
+    public int compareTo(SokobanState other) {
+        return Integer.compare(this.score, other.score);
     }
 
     @Override

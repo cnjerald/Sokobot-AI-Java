@@ -11,6 +11,7 @@ public class SokoBot {
   List<Coordinate> deadTiles = new ArrayList<>();
   ArrayList<Integer> goalXList = new ArrayList<>();
   ArrayList<Integer> goalYList = new ArrayList<>();
+
   public String solveSokobanPuzzle(int width, int height, char[][] mapData, char[][] itemsData) {
 
     try {
@@ -512,7 +513,7 @@ public class SokoBot {
     SokobanState[] array = stack.toArray(new SokobanState[0]);
     SokobanState lowestScoreState = array[0];
 
-    for (int i = 1; i < array.length; i++) {
+    for (int i = array.length / 2; i < array.length; i++) {
       if (array[i].getScore() < lowestScoreState.getScore()) {
         lowestScoreState = array[i];
       }
