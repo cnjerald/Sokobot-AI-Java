@@ -2,11 +2,11 @@ package solver;
 
 import java.util.*;
 
-public class SokobanState implements Comparable<SokobanState> {
+public class SokobanState{
     private Coordinate playerPosition;
-    private HashMap<Coordinate, Integer> cratePosition = new HashMap<>();
-    private SokobanState parent = null;
-    private int score;
+    private HashMap<Coordinate, Integer> cratePosition;
+    private SokobanState parent;
+    private double score;
     private int moves;
     private String prevMove;
 
@@ -38,11 +38,11 @@ public class SokobanState implements Comparable<SokobanState> {
         return prevMove;
     }
 
-    public void setHeuristicScore(int score) {
+    public void setHeuristicScore(double score) {
         this.score = score;
     }
 
-    public int getScore() {
+    public double getScore() {
         return this.score;
     }
 
@@ -55,12 +55,6 @@ public class SokobanState implements Comparable<SokobanState> {
         SokobanState that = (SokobanState) o;
         return Objects.equals(playerPosition, that.playerPosition) &&
                 Objects.equals(cratePosition, that.cratePosition);
-    }
-
-
-    @Override
-    public int compareTo(SokobanState other) {
-        return Integer.compare(this.score, other.score);
     }
 
     @Override
