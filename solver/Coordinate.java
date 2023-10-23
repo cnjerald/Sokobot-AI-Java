@@ -37,5 +37,4 @@ public class Coordinate {
             return true;
         return ((this.x == c.x) && (this.y == c.y));
     }
-
 }
