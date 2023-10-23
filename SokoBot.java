@@ -11,6 +11,7 @@ public class SokoBot {
     ArrayList<Integer> goalXList = new ArrayList<>();
     ArrayList<Integer> goalYList = new ArrayList<>();
 
+
     public String solveSokobanPuzzle(int width, int height, char[][] mapData, char[][] itemsData) {
         try {
             Coordinate initialPlayerPosition = new Coordinate(-1, -1);
@@ -361,13 +362,18 @@ public class SokoBot {
      */
     public int calculateManHDistCratesToGoals(SokobanState state) {
         int minimum = Integer.MAX_VALUE; // Initialize with a high value to find the minimum distance
+        int counter = 0;
         for (Coordinate cratePosition : state.getCratePosition().keySet()) {
             for (Coordinate goalCoordinate : goals) {
                 int manhattanDistance = Math.abs(cratePosition.getX() - goalCoordinate.getX()) + Math.abs(cratePosition.getY() - goalCoordinate.getY());
-                minimum = Math.min(minimum, manhattanDistance);
+                if(manhattanDistance != 0){
+                    minimum = Math.min(minimum, manhattanDistance);
+                } else{
+                    counter++;
+                }
             }
         }
-        return minimum;
+        return minimum + (goals.size() - counter);
     }
 
     /**
