@@ -199,22 +199,22 @@ public class SokoBot {
                     }
                 }
 
-                    if (state.getCratePosition().get(new Coordinate(playerx, playery + 1)) != null) {
-                        if (!goals.contains(new Coordinate(playerx , playery + 2))) {
-                            if (state.getCratePosition().get(new Coordinate(playerx, playery + 3)) != null) {
-                                if (walls.contains(new Coordinate(playerx + 1, playery + 3)) && walls.contains(new Coordinate(playerx + 1,playery + 2))) {
-                                    return false;
-                                }
-                                else if (walls.contains(new Coordinate(playerx - 1, playery + 3)) && walls.contains(new Coordinate(playerx - 1,playery + 2))) {
-                                    return false;
-                                }
+                if (state.getCratePosition().get(new Coordinate(playerx, playery + 1)) != null) {
+                    if (!goals.contains(new Coordinate(playerx , playery + 2))) {
+                        if (state.getCratePosition().get(new Coordinate(playerx, playery + 3)) != null) {
+                            if (walls.contains(new Coordinate(playerx + 1, playery + 3)) && walls.contains(new Coordinate(playerx + 1, playery + 2))) {
+                                return false;
+                            }
+                            else if (walls.contains(new Coordinate(playerx - 1, playery + 3)) && walls.contains(new Coordinate(playerx - 1, playery + 2))) {
+                                return false;
                             }
                         }
                     }
+                }
 
                 if (state.getCratePosition().get(new Coordinate(playerx , playery + 1)) != null) { // if there is a crate
                     if (!goals.contains(new Coordinate(playerx , playery + 2))) {
-                        if(walls.contains(new Coordinate(playerx,playery+3))) {
+                        if(walls.contains(new Coordinate(playerx, playery + 3))) {
                             if (state.getCratePosition().get(new Coordinate(playerx + 1, playery + 2)) != null
                                 && walls.contains(new Coordinate(playerx + 1, playery + 3))) {
                                 return false;
@@ -245,7 +245,7 @@ public class SokoBot {
                 if (state.getCratePosition().get(new Coordinate(playerx, playery - 1)) != null) {
                     if (!goals.contains(new Coordinate(playerx , playery - 2))) {
                         if (state.getCratePosition().get(new Coordinate(playerx, playery - 3)) != null) {
-                            if (walls.contains(new Coordinate(playerx + 1, playery - 3)) && walls.contains(new Coordinate(playerx + 1,playery - 2))) {
+                            if (walls.contains(new Coordinate(playerx + 1, playery - 3)) && walls.contains(new Coordinate(playerx + 1, playery - 2))) {
                                 return false;
                             }
                             else if (walls.contains(new Coordinate(playerx - 1, playery - 3)) && walls.contains(new Coordinate(playerx - 1, playery - 2))) {
@@ -257,12 +257,12 @@ public class SokoBot {
 
                 if (state.getCratePosition().get(new Coordinate(playerx , playery - 1)) != null) { // if there is a crate
                     if (!goals.contains(new Coordinate(playerx , playery - 2))) {
-                        if(walls.contains(new Coordinate(playerx,playery-3))) {
+                        if(walls.contains(new Coordinate(playerx, playery - 3))) {
                             if (state.getCratePosition().get(new Coordinate(playerx + 1, playery - 2)) != null
                                 && walls.contains(new Coordinate(playerx + 1, playery - 3))) {
                                 return false;
                             }
-                            else if (state.getCratePosition().get(new Coordinate(playerx-1,playery-2)) != null
+                            else if (state.getCratePosition().get(new Coordinate(playerx - 1, playery - 2)) != null
                                 && walls.contains(new Coordinate(playerx - 1, playery - 3))) {
                                 return false;
                             }
@@ -288,10 +288,10 @@ public class SokoBot {
                 if (state.getCratePosition().get(new Coordinate(playerx - 1, playery)) != null) {
                     if (!goals.contains(new Coordinate(playerx - 2, playery))) {
                         if (state.getCratePosition().get(new Coordinate(playerx - 3, playery)) != null) {
-                            if (walls.contains(new Coordinate(playerx-3,playery+1)) && walls.contains(new Coordinate(playerx - 2,playery + 1))) {
+                            if (walls.contains(new Coordinate(playerx - 3, playery + 1)) && walls.contains(new Coordinate(playerx - 2, playery + 1))) {
                                 return false;
                             }
-                            else if (walls.contains(new Coordinate(playerx-3,playery-1)) && walls.contains(new Coordinate(playerx - 2,playery - 1))) {
+                            else if (walls.contains(new Coordinate(playerx - 3, playery - 1)) && walls.contains(new Coordinate(playerx - 2, playery - 1))) {
                                 return false;
                             }   
                         }
@@ -305,8 +305,8 @@ public class SokoBot {
                                 && walls.contains(new Coordinate(playerx - 3, playery +1 ))) {
                                 return false;
                             }
-                            else if (state.getCratePosition().get(new Coordinate(playerx - 2,playery - 1)) != null
-                                && walls.contains(new Coordinate(playerx-3,playery-1))) {
+                            else if (state.getCratePosition().get(new Coordinate(playerx - 2, playery - 1)) != null
+                                && walls.contains(new Coordinate(playerx - 3, playery - 1))) {
                                 return false;
                             }
                         }
@@ -331,10 +331,10 @@ public class SokoBot {
                 if (state.getCratePosition().get(new Coordinate(playerx + 1, playery)) != null) {
                     if (!goals.contains(new Coordinate(playerx + 2, playery))) {
                         if (state.getCratePosition().get(new Coordinate(playerx + 3, playery)) != null) {
-                            if (walls.contains(new Coordinate(playerx+3,playery+1)) && walls.contains(new Coordinate(playerx+2,playery+1))) {
+                            if (walls.contains(new Coordinate(playerx + 3, playery + 1)) && walls.contains(new Coordinate(playerx + 2, playery + 1))) {
                                 return false;
                             }
-                            else if (walls.contains(new Coordinate(playerx + 3,playery - 1)) && walls.contains(new Coordinate(playerx+2,playery-1))) {
+                            else if (walls.contains(new Coordinate(playerx + 3, playery - 1)) && walls.contains(new Coordinate(playerx + 2, playery - 1))) {
                                 return false;
                             }
                         }
@@ -343,12 +343,12 @@ public class SokoBot {
 
                 if (state.getCratePosition().get(new Coordinate(playerx + 1, playery)) != null) { // if there is a crate
                     if (!goals.contains(new Coordinate(playerx + 2, playery))) {
-                        if(walls.contains(new Coordinate(playerx + 3, playery))){
+                        if(walls.contains(new Coordinate(playerx + 3, playery))) {
                             if (state.getCratePosition().get(new Coordinate(playerx + 2, playery + 1)) != null
-                                && walls.contains(new Coordinate(playerx + 3,playery + 1))) {
+                                && walls.contains(new Coordinate(playerx + 3, playery + 1))) {
                                 return false;
                             }
-                            else if (state.getCratePosition().get(new Coordinate(playerx + 2,playery - 1)) != null
+                            else if (state.getCratePosition().get(new Coordinate(playerx + 2, playery - 1)) != null
                                 && walls.contains(new Coordinate(playerx + 3, playery - 1))) {
                                 return false;
                             }
@@ -369,13 +369,19 @@ public class SokoBot {
      */
     public int calculateManHDistCratesToGoals(SokobanState state) {
         int minimum = Integer.MAX_VALUE; // Initialize with a high value to find the minimum distance
+        int counter = 0;
         for (Coordinate cratePosition : state.getCratePosition().keySet()) {
             for (Coordinate goalCoordinate : goals) {
                 int manhattanDistance = Math.abs(cratePosition.getX() - goalCoordinate.getX()) + Math.abs(cratePosition.getY() - goalCoordinate.getY());
-                minimum = Math.min(minimum, manhattanDistance);
+                if (manhattanDistance != 0) {
+                    minimum = Math.min(minimum, manhattanDistance);
+                }
+                else {
+                    counter++;
+                }
             }
         }
-        return minimum;
+        return minimum + (goals.size() - counter);
     }
 
     /**
