@@ -199,30 +199,30 @@ public class SokoBot {
                     }
                 }
 
-                // If the crate is adjacent and PARALLEL to the wall, and the crate is pushed adjacent to another crate on the direction
-                // where it is pushed
-                if (state.getCratePosition().get(new Coordinate(playerx, playery + 1)) != null) {
-                    if (!goals.contains(new Coordinate(playerx, playery + 2))) {
-                        if (state.getCratePosition().get(new Coordinate(playerx, playery + 3)) != null
-                                && ((walls.contains(new Coordinate(playerx - 1, playery + 2))
-                                && walls.contains(new Coordinate(playerx - 1, playery + 3))) ||
-                                (walls.contains(new Coordinate(playerx + 1, playery + 2))
-                                    && walls.contains(new Coordinate(playerx + 1, playery + 3))))) {
-                            return false;
+                    if (state.getCratePosition().get(new Coordinate(playerx, playery + 1)) != null) {
+                        if (!goals.contains(new Coordinate(playerx , playery + 2))) {
+                            if (state.getCratePosition().get(new Coordinate(playerx, playery + 3)) != null) {
+                                if (walls.contains(new Coordinate(playerx + 1, playery + 3)) && walls.contains(new Coordinate(playerx + 1,playery + 2))) {
+                                    return false;
+                                }
+                                else if (walls.contains(new Coordinate(playerx - 1, playery + 3)) && walls.contains(new Coordinate(playerx - 1,playery + 2))) {
+                                    return false;
+                                }
+                            }
                         }
                     }
-                }
 
-                // If the crate is adjacent and PERPENDICULAR to the wall, and the crate is pushed adjacent to another crate on the direction
-                // where it is pushed
-                if (state.getCratePosition().get(new Coordinate(playerx, playery + 1)) != null) { // if there is a crate
-                    if (!goals.contains(new Coordinate(playerx, playery + 2))) {
-                        if ((state.getCratePosition().get(new Coordinate(playerx + 1, playery + 2)) != null || // crate adjacency left
-                                state.getCratePosition().get(new Coordinate(playerx - 1, playery + 2)) != null) // crate adjacency right
-                                && walls.contains(new Coordinate(playerx, playery + 3)) && // wall below first crate
-                                (walls.contains(new Coordinate(playerx - 1, playery + 3)) || // wall below second crate
-                                    walls.contains(new Coordinate(playerx + 1, playery + 3)))) {
-                            return false;
+                if (state.getCratePosition().get(new Coordinate(playerx , playery + 1)) != null) { // if there is box
+                    if (!goals.contains(new Coordinate(playerx , playery + 2))) {
+                        if(walls.contains(new Coordinate(playerx,playery+3))) {
+                            if (state.getCratePosition().get(new Coordinate(playerx + 1, playery + 2)) != null
+                                && walls.contains(new Coordinate(playerx + 1, playery + 3))) {
+                                return false;
+                            }
+                            else if (state.getCratePosition().get(new Coordinate(playerx - 1, playery + 2)) != null
+                                && walls.contains(new Coordinate(playerx - 1, playery + 3))) {
+                                return false;
+                            }
                         }
                     }
                 }
@@ -242,26 +242,30 @@ public class SokoBot {
                     }
                 }
 
-                if (state.getCratePosition().get(new Coordinate(playerx, playery - 1)) != null) { // if there is a crate
-                    if (!goals.contains(new Coordinate(playerx, playery - 2))) {
-                        if (state.getCratePosition().get(new Coordinate(playerx, playery - 3)) != null
-                                && ((walls.contains(new Coordinate(playerx - 1, playery - 2))
-                                && walls.contains(new Coordinate(playerx - 1, playery - 3))) ||
-                                (walls.contains(new Coordinate(playerx + 1, playery - 2))
-                                    && walls.contains(new Coordinate(playerx + 1, playery - 3))))) {
-                            return false;
+                if (state.getCratePosition().get(new Coordinate(playerx, playery - 1)) != null) {
+                    if (!goals.contains(new Coordinate(playerx , playery - 2))) {
+                        if (state.getCratePosition().get(new Coordinate(playerx, playery - 3)) != null) {
+                            if (walls.contains(new Coordinate(playerx + 1, playery - 3)) && walls.contains(new Coordinate(playerx + 1,playery - 2))) {
+                                return false;
+                            }
+                            else if (walls.contains(new Coordinate(playerx - 1, playery - 3)) && walls.contains(new Coordinate(playerx - 1, playery - 2))) {
+                                return false;
+                            }
                         }
                     }
                 }
 
-                if (state.getCratePosition().get(new Coordinate(playerx, playery - 1)) != null) { // if there is a crate
-                    if (!goals.contains(new Coordinate(playerx, playery - 2))) {
-                        if ((state.getCratePosition().get(new Coordinate(playerx + 1, playery - 2)) != null || // crate adjacency left
-                                state.getCratePosition().get(new Coordinate(playerx - 1, playery - 2)) != null) // crate adjacency right
-                                && walls.contains(new Coordinate(playerx, playery - 3)) && // wall below first crate
-                                (walls.contains(new Coordinate(playerx - 1, playery - 3)) || // wall below second crate
-                                    walls.contains(new Coordinate(playerx + 1,playery - 3)))) {
-                            return false;
+                if (state.getCratePosition().get(new Coordinate(playerx , playery - 1)) != null) { // if there is box
+                    if (!goals.contains(new Coordinate(playerx , playery - 2))) {
+                        if(walls.contains(new Coordinate(playerx,playery-3))) {
+                            if (state.getCratePosition().get(new Coordinate(playerx + 1, playery - 2)) != null
+                                && walls.contains(new Coordinate(playerx + 1, playery - 3))) {
+                                return false;
+                            }
+                            else if (state.getCratePosition().get(new Coordinate(playerx-1,playery-2)) != null
+                                && walls.contains(new Coordinate(playerx - 1, playery - 3))) {
+                                return false;
+                            }
                         }
                     }
                 }
@@ -283,24 +287,28 @@ public class SokoBot {
 
                 if (state.getCratePosition().get(new Coordinate(playerx - 1, playery)) != null) {
                     if (!goals.contains(new Coordinate(playerx - 2, playery))) {
-                        if (state.getCratePosition().get(new Coordinate(playerx - 3, playery)) != null
-                                && ((walls.contains(new Coordinate(playerx - 2, playery - 1))
-                                && walls.contains(new Coordinate(playerx - 3, playery - 1))) ||
-                                (walls.contains(new Coordinate(playerx - 2, playery + 1))
-                                    && walls.contains(new Coordinate(playerx - 3, playery + 1))))) {
-                            return false;
+                        if (state.getCratePosition().get(new Coordinate(playerx - 3, playery)) != null) {
+                            if (walls.contains(new Coordinate(playerx-3,playery+1)) && walls.contains(new Coordinate(playerx - 2,playery + 1))) {
+                                return false;
+                            }
+                            else if (walls.contains(new Coordinate(playerx-3,playery-1)) && walls.contains(new Coordinate(playerx - 2,playery - 1))) {
+                                return false;
+                            }   
                         }
                     }
                 }
 
-                if (state.getCratePosition().get(new Coordinate(playerx - 1, playery)) != null) { // if there is a crate
+                if (state.getCratePosition().get(new Coordinate(playerx - 1, playery)) != null) { // if there is box
                     if (!goals.contains(new Coordinate(playerx - 2, playery))) {
-                        if ((state.getCratePosition().get(new Coordinate(playerx - 2, playery + 1)) != null || // crate adjacency left
-                                state.getCratePosition().get(new Coordinate(playerx - 2, playery - 1)) != null) // crate adjacency right
-                                && walls.contains(new Coordinate(playerx - 3, playery)) && // wall below first crate
-                                (walls.contains(new Coordinate(playerx - 3, playery + 1)) || // wall below second crate
-                                    walls.contains(new Coordinate(playerx - 3, playery - 1)))) {
-                            return false;
+                        if(walls.contains(new Coordinate(playerx - 3, playery))) {
+                            if (state.getCratePosition().get(new Coordinate(playerx - 2, playery + 1)) != null
+                                && walls.contains(new Coordinate(playerx - 3, playery +1 ))) {
+                                return false;
+                            }
+                            else if (state.getCratePosition().get(new Coordinate(playerx - 2,playery - 1)) != null
+                                && walls.contains(new Coordinate(playerx-3,playery-1))) {
+                                return false;
+                            }
                         }
                     }
                 }
@@ -322,24 +330,28 @@ public class SokoBot {
 
                 if (state.getCratePosition().get(new Coordinate(playerx + 1, playery)) != null) {
                     if (!goals.contains(new Coordinate(playerx + 2, playery))) {
-                        if (state.getCratePosition().get(new Coordinate(playerx + 3, playery)) != null
-                                && ((walls.contains(new Coordinate(playerx + 2, playery - 1))
-                                && walls.contains(new Coordinate(playerx + 3, playery - 1))) ||
-                                (walls.contains(new Coordinate(playerx + 2, playery + 1))
-                                    && walls.contains(new Coordinate(playerx + 3, playery + 1))))) {
-                            return false;
+                        if (state.getCratePosition().get(new Coordinate(playerx + 3, playery)) != null) {
+                            if (walls.contains(new Coordinate(playerx+3,playery+1)) && walls.contains(new Coordinate(playerx+2,playery+1))) {
+                                return false;
+                            }
+                            else if (walls.contains(new Coordinate(playerx + 3,playery - 1)) && walls.contains(new Coordinate(playerx+2,playery-1))) {
+                                return false;
+                            }
                         }
                     }
                 }
 
-                if (state.getCratePosition().get(new Coordinate(playerx + 1, playery)) != null) {// if there is a crate
+                if (state.getCratePosition().get(new Coordinate(playerx + 1, playery)) != null) { // if there is box
                     if (!goals.contains(new Coordinate(playerx + 2, playery))) {
-                        if ((state.getCratePosition().get(new Coordinate(playerx + 2, playery + 1)) != null || // crate adjacency left
-                                state.getCratePosition().get(new Coordinate(playerx + 2, playery - 1)) != null) // crate adjacency right
-                                && walls.contains(new Coordinate(playerx + 3, playery)) && // wall below first crate
-                                (walls.contains(new Coordinate(playerx + 3, playery + 1)) || // wall below second crate
-                                    walls.contains(new Coordinate(playerx + 3, playery - 1)))) {
-                            return false;
+                        if(walls.contains(new Coordinate(playerx + 3, playery))){
+                            if (state.getCratePosition().get(new Coordinate(playerx + 2, playery + 1)) != null
+                                && walls.contains(new Coordinate(playerx + 3,playery + 1))) {
+                                return false;
+                            }
+                            else if (state.getCratePosition().get(new Coordinate(playerx + 2,playery - 1)) != null
+                                && walls.contains(new Coordinate(playerx + 3, playery - 1))) {
+                                return false;
+                            }
                         }
                     }
                 }
