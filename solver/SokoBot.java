@@ -212,7 +212,7 @@ public class SokoBot {
                         }
                     }
 
-                if (state.getCratePosition().get(new Coordinate(playerx , playery + 1)) != null) { // if there is box
+                if (state.getCratePosition().get(new Coordinate(playerx , playery + 1)) != null) { // if there is a crate
                     if (!goals.contains(new Coordinate(playerx , playery + 2))) {
                         if(walls.contains(new Coordinate(playerx,playery+3))) {
                             if (state.getCratePosition().get(new Coordinate(playerx + 1, playery + 2)) != null
@@ -255,7 +255,7 @@ public class SokoBot {
                     }
                 }
 
-                if (state.getCratePosition().get(new Coordinate(playerx , playery - 1)) != null) { // if there is box
+                if (state.getCratePosition().get(new Coordinate(playerx , playery - 1)) != null) { // if there is a crate
                     if (!goals.contains(new Coordinate(playerx , playery - 2))) {
                         if(walls.contains(new Coordinate(playerx,playery-3))) {
                             if (state.getCratePosition().get(new Coordinate(playerx + 1, playery - 2)) != null
@@ -298,7 +298,7 @@ public class SokoBot {
                     }
                 }
 
-                if (state.getCratePosition().get(new Coordinate(playerx - 1, playery)) != null) { // if there is box
+                if (state.getCratePosition().get(new Coordinate(playerx - 1, playery)) != null) { // if there is a crate
                     if (!goals.contains(new Coordinate(playerx - 2, playery))) {
                         if(walls.contains(new Coordinate(playerx - 3, playery))) {
                             if (state.getCratePosition().get(new Coordinate(playerx - 2, playery + 1)) != null
@@ -341,7 +341,7 @@ public class SokoBot {
                     }
                 }
 
-                if (state.getCratePosition().get(new Coordinate(playerx + 1, playery)) != null) { // if there is box
+                if (state.getCratePosition().get(new Coordinate(playerx + 1, playery)) != null) { // if there is a crate
                     if (!goals.contains(new Coordinate(playerx + 2, playery))) {
                         if(walls.contains(new Coordinate(playerx + 3, playery))){
                             if (state.getCratePosition().get(new Coordinate(playerx + 2, playery + 1)) != null
